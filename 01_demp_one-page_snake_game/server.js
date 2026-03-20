@@ -146,8 +146,11 @@ function update() {
   dir = { ...nextDir };
   const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
 
-  if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS ||
-      snake.some(s => s.x === head.x && s.y === head.y)) {
+  // Wrap around walls
+  head.x = (head.x + COLS) % COLS;
+  head.y = (head.y + ROWS) % ROWS;
+
+  if (snake.some(s => s.x === head.x && s.y === head.y)) {
     gameOver = true;
     running = false;
     clearInterval(interval);
