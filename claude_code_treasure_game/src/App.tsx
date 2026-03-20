@@ -1,6 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { Button } from './components/ui/button';
+import { useAuth } from './contexts/AuthContext';
+import { AuthDialog } from './components/AuthDialog';
+import { UserHeader } from './components/UserHeader';
+import { ScoreHistory } from './components/ScoreHistory';
+import { saveScore } from './lib/api';
 import closedChest from './assets/treasure_closed.png';
 import treasureChest from './assets/treasure_opened.png';
 import skeletonChest from './assets/treasure_opened_skeleton.png';
@@ -15,9 +20,13 @@ interface Box {
 }
 
 export default function App() {
+  const { user, isGuest, loading } = useAuth();
   const [boxes, setBoxes] = useState<Box[]>([]);
   const [score, setScore] = useState(0);
   const [gameEnded, setGameEnded] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const scoreSavedRef = useRef(false);
 
   const initializeGame = () => {
     // Randomly assign treasure to one box
@@ -68,12 +77,41 @@ export default function App() {
     });
   };
 
+  // Save score when game ends (logged-in users only)
+  useEffect(() => {
+    if (gameEnded && user && !scoreSavedRef.current) {
+      scoreSavedRef.current = true;
+      const chestsOpened = boxes.filter(b => b.isOpen).length;
+      const result = score > 0 ? 'win' : score === 0 ? 'tie' : 'loss';
+      saveScore(score, result, chestsOpened).catch(console.error);
+    }
+  }, [gameEnded, user, score, boxes]);
+
   const resetGame = () => {
+    scoreSavedRef.current = false;
     initializeGame();
   };
 
+  if (loading) return null;
+
+  if (showHistory && user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-amber-100 p-8">
+        <UserHeader onShowHistory={() => setShowHistory(false)} onOpenAuth={() => setShowAuthDialog(true)} />
+        <div className="flex justify-center mb-4">
+          <Button variant="outline" onClick={() => setShowHistory(false)}>
+            返回遊戲
+          </Button>
+        </div>
+        <ScoreHistory />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-amber-100 flex flex-col items-center justify-center p-8">
+      <AuthDialog open={showAuthDialog} onOpenChange={setShowAuthDialog} />
+      <UserHeader onShowHistory={() => setShowHistory(true)} onOpenAuth={() => setShowAuthDialog(true)} />
       <div className="text-center mb-8">
         <h1 className="text-4xl mb-4 text-amber-900">🏴‍☠️ Treasure Hunt Game 🏴‍☠️</h1>
         <p className="text-amber-800 mb-4">
