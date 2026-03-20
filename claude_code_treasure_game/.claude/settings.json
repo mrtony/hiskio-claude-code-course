@@ -1,0 +1,5 @@
+{
+  "claudeMdExcludes": [
+    "**/hiskio-claude-code-course/CLAUDE.md"
+  ]
+}
