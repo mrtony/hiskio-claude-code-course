@@ -11,6 +11,7 @@ git checkout -b add-treasure-game
 ```
 
 執行前不能有任何檔案變更，確保工作區是乾淨的。
+子模組的branch是`master`
 ```bash
-git subtree add --prefix=claude_code_treasure_game ../claude_code_treasure_game main --squash
+git subtree add --prefix=claude_code_treasure_game ../claude_code_treasure_game master --squash
 ```
