@@ -15,3 +15,17 @@ git checkout -b add-treasure-game
 ```bash
 git subtree add --prefix=claude_code_treasure_game ../claude_code_treasure_game master --squash
 ```
+
+**開發方式**
+
+1. 切換目錄： cd ../claude_code_treasure_game
+2. 正常開發與 Commit
+```bash
+git add .
+git commit -m "在獨立環境新增功能"
+```
+3. 將變更「拉進」專案 A
+```bash
+cd ../hiskio-claude-code-course
+git subtree pull --prefix=claude_code_treasure_game ../claude_code_treasure_game master --squash
+```
