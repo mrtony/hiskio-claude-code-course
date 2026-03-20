@@ -12,6 +12,10 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/scores', scoreRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
+
+export default app;
