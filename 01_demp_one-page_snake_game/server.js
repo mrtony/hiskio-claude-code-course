@@ -137,6 +137,8 @@ function update() {
     scoreEl.textContent = '分數: ' + score;
     foods.splice(eatenIndex, 1);
     placeFood();
+    // Grow by 2: one from not popping, one by duplicating the tail
+    snake.push({ ...snake[snake.length - 1] });
   } else {
     snake.pop();
   }

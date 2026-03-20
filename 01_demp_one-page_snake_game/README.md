@@ -37,5 +37,14 @@ now I want to have 2 food appear at the same time, and the snake can eat either 
 now I want to use the spacebar to pause and resume the game. please modify the code accordingly.
 ```
 
-## 作業1
+## 作業1 - 吃到一個超級食物會長出2個尾巴
 
+```text
+now I want to have a super food that appears randomly and if the snake eats it, it will grow 2 tails instead of 1. please modify the code accordingly.
+```
+
+## 作業2 - 有穿牆功能
+
+```text
+now I want to have the snake be able to go through walls and appear on the opposite side. please modify the code accordingly.
+```
