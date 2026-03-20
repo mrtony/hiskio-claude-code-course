@@ -56,7 +56,7 @@ const GRID = 20;
 const COLS = canvas.width / GRID;
 const ROWS = canvas.height / GRID;
 
-let snake, dir, nextDir, foods, score, running, paused, gameOver, interval;
+let snake, dir, nextDir, foods, superFood, score, running, paused, gameOver, interval;
 
 function init() {
   snake = [{ x: Math.floor(COLS / 2), y: Math.floor(ROWS / 2) }];
@@ -69,19 +69,33 @@ function init() {
   scoreEl.textContent = '分數: 0';
   msgEl.textContent = '按任意方向鍵開始遊戲';
   foods = [];
+  superFood = null;
   placeFood();
   placeFood();
+  maybeSpawnSuperFood();
   draw();
   if (interval) clearInterval(interval);
+}
+
+function isOccupied(pos) {
+  return snake.some(s => s.x === pos.x && s.y === pos.y) ||
+         foods.some(e => e.x === pos.x && e.y === pos.y) ||
+         (superFood && superFood.x === pos.x && superFood.y === pos.y);
 }
 
 function placeFood() {
   while (true) {
     const f = { x: Math.floor(Math.random() * COLS), y: Math.floor(Math.random() * ROWS) };
-    if (!snake.some(s => s.x === f.x && s.y === f.y) &&
-        !foods.some(e => e.x === f.x && e.y === f.y)) {
-      foods.push(f);
-      break;
+    if (!isOccupied(f)) { foods.push(f); break; }
+  }
+}
+
+function maybeSpawnSuperFood() {
+  if (superFood) return;
+  if (Math.random() < 0.3) {
+    while (true) {
+      const f = { x: Math.floor(Math.random() * COLS), y: Math.floor(Math.random() * ROWS) };
+      if (!isOccupied(f)) { superFood = f; break; }
     }
   }
 }
@@ -107,6 +121,18 @@ function draw() {
     ctx.fill();
   });
 
+  // Draw super food
+  if (superFood) {
+    ctx.fillStyle = '#ffd700';
+    ctx.beginPath();
+    ctx.arc(superFood.x * GRID + GRID / 2, superFood.y * GRID + GRID / 2, GRID / 2 - 1, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#ff8c00';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.lineWidth = 1;
+  }
+
   // Draw snake
   snake.forEach((seg, i) => {
     ctx.fillStyle = i === 0 ? '#0f3460' : '#533483';
@@ -131,16 +157,25 @@ function update() {
 
   snake.unshift(head);
 
-  const eatenIndex = foods.findIndex(f => f.x === head.x && f.y === head.y);
-  if (eatenIndex !== -1) {
-    score++;
+  // Check super food first
+  if (superFood && head.x === superFood.x && head.y === superFood.y) {
+    score += 2;
     scoreEl.textContent = '分數: ' + score;
-    foods.splice(eatenIndex, 1);
-    placeFood();
+    superFood = null;
     // Grow by 2: one from not popping, one by duplicating the tail
     snake.push({ ...snake[snake.length - 1] });
+    maybeSpawnSuperFood();
   } else {
-    snake.pop();
+    const eatenIndex = foods.findIndex(f => f.x === head.x && f.y === head.y);
+    if (eatenIndex !== -1) {
+      score++;
+      scoreEl.textContent = '分數: ' + score;
+      foods.splice(eatenIndex, 1);
+      placeFood();
+      maybeSpawnSuperFood();
+    } else {
+      snake.pop();
+    }
   }
 
   draw();
