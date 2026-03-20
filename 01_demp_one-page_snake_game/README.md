@@ -31,5 +31,11 @@ node server.js
 now I want to have 2 food appear at the same time, and the snake can eat either one of them to grow. please modify the code accordingly.
 ```
 
+## 異動-使用空白鍵暫停遊戲
+
+```text
+now I want to use the spacebar to pause and resume the game. please modify the code accordingly.
+```
+
 ## 作業1
 

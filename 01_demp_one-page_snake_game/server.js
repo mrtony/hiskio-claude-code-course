@@ -45,7 +45,7 @@ const html = `<!DOCTYPE html>
 <div id="score">分數: 0</div>
 <canvas id="game" width="400" height="400"></canvas>
 <div id="message">按任意方向鍵開始遊戲</div>
-<div class="controls">方向鍵 / WASD 控制方向，R 重新開始</div>
+<div class="controls">方向鍵 / WASD 控制方向，空白鍵暫停/繼續，R 重新開始</div>
 <script>
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
@@ -56,7 +56,7 @@ const GRID = 20;
 const COLS = canvas.width / GRID;
 const ROWS = canvas.height / GRID;
 
-let snake, dir, nextDir, foods, score, running, gameOver, interval;
+let snake, dir, nextDir, foods, score, running, paused, gameOver, interval;
 
 function init() {
   snake = [{ x: Math.floor(COLS / 2), y: Math.floor(ROWS / 2) }];
@@ -64,6 +64,7 @@ function init() {
   nextDir = { x: 0, y: 0 };
   score = 0;
   running = false;
+  paused = false;
   gameOver = false;
   scoreEl.textContent = '分數: 0';
   msgEl.textContent = '按任意方向鍵開始遊戲';
@@ -147,6 +148,21 @@ document.addEventListener('keydown', (e) => {
   const key = e.key.toLowerCase();
 
   if (key === 'r') { init(); return; }
+
+  if (e.code === 'Space') {
+    e.preventDefault();
+    if (!running || gameOver) return;
+    if (paused) {
+      paused = false;
+      msgEl.textContent = '';
+      interval = setInterval(update, 120);
+    } else {
+      paused = true;
+      clearInterval(interval);
+      msgEl.textContent = '暫停中 — 按空白鍵繼續';
+    }
+    return;
+  }
 
   const dirs = {
     arrowup:    { x: 0, y: -1 }, w: { x: 0, y: -1 },
